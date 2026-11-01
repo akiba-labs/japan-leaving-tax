@@ -1,0 +1,77 @@
+# Japan Leaving Tax Check
+
+> Free, unofficial checker for what tax and paperwork you still owe when you leave Japan. Resident tax (住民税, juminzei) is assessed on whoever is registered in a city on January 1 (地方税法 39 / 294 / 318), on the previous calendar year's income, for the fiscal year June–May: leave (with a 転出届) on or before December 31 → no 住民税 for the next fiscal year; leave January 2 or later → that fiscal year is owed in full. Leaving January–May, the bill is issued in mid-June after you go → tax agent (納税管理人, 地方税法 300). Payroll (特別徴収): job ending January 1 – April 30 → remaining installments taken in one lump sum from the final pay (地方税法 321-5 ②); June–December → only on request. Income tax: year-end adjustment on the last salary before departure; 準確定申告 by departure if a return is needed and no agent (所得税法 127). Also the 転出届 window, pension Lump-sum Withdrawal claim (within 2 years) and residence card. Rules as of 2026-11-01. Educational, not tax or legal advice; not affiliated with the NTA, MIC, any city office, the Japan Pension Service or the Immigration Services Agency. No yen amounts.
+
+Site: https://japan-leaving-tax.vercel.app
+
+## Key facts (official sources below)
+- Assessment date (賦課期日): January 1. The city where you are registered (住民基本台帳) on January 1 charges that fiscal year's 住民税 (prefectural + municipal + ¥1,000 森林環境税) on last year's income. MIC: leaving on January 2 or later doesn't change this.
+- Leave by December 31 with a 転出届 → not registered on the next January 1 → no next-year 住民税 on this year's income. Arrived after January 1 and leaving the same year → no 住民税 for that stay.
+- Fiscal year N = June N – May N+1. Payroll deduction: 12 monthly amounts June–May. Self-pay bills: issued in June, installments June / August / October / January.
+- Leaving January–May while registered on January 1: the fiscal-year bill is only issued around mid-June → notify the city of a tax agent (納税管理人申告書) before leaving, or settle / get certified (地方税法 300 ②).
+- Payroll lump sum (一括徴収, 地方税法 321-5 ②): job ends January 1 – April 30 → mandatory from the final salary / retirement pay if it covers the rest (MIC: January–May); June 1 – December 31 → only on the worker's request, otherwise the rest becomes self-pay bills.
+- Unpaid resident tax can be a problem later for residence-status renewals in Japan (MIC).
+- Income tax: employee leaving mid-year → year-end adjustment on the last salary paid before departure (salary ≤ ¥20M, NTA 1920, 所得税法 190). Return needed (side income, salary > ¥20M, self-employed, rent…) → 準確定申告 by departure, or by March 15 next year via a tax agent notified to the tax office (所得税法 127, NTA 1926). Leaving January 1 – March 15 with last year's return due → by departure (所得税法 126). Tax agent form: 「所得税・消費税の納税管理人の届出書」 (国税通則法 117, NTA 1923). ¥100M+ securities → exit tax (国外転出時課税, NTA 1478).
+- 転出届 (国外転出): filed in advance (住民基本台帳法 24), in practice from about 14 days before. Trips under a year normally keep the registration.
+- Pension: non-Japanese with 6+ months of contributions and under 10 years of coverage can claim the Lump-sum Withdrawal Payment within 2 years of leaving (Japan Pension Service).
+- Not covered: yen amounts, tax treaties (some students / teachers exempt), consumption / inheritance / gift tax, director fees, city-specific forms.
+
+## API (free, no key, CORS open)
+
+### GET
+GET https://japan-leaving-tax.vercel.app/api/check?departureDate=2027-03-20&employment=employee&payMethod=salary&today=2026-11-01
+→ verdict "agent_needed", summary "Leaving on 2027-03-20 you still owe fiscal year 2027 住民税 (billed in June 2027, after you go): appoint a tax agent (納税管理人) before you leave.", residentTax {fiscalYears [FY2026 owed (lump sum from final pay, mandatory), FY2027 owed (agent), FY2028 not_owed], leaveByToAvoidNextFY "2027-12-31", lumpSumFromFinalPay "mandatory", agentRequired true}, incomeTax {yearEndAdjustment true, returnRequired false}, deadlines [{date, what, ja, mandatory, passed}], actions, warnings, pension {lumpSumClaimBy "2029-03-20"}, sources, disclaimer
+
+### POST
+POST https://japan-leaving-tax.vercel.app/api/check
+{"departureDate":"2027-01-15","employment":"self_employed","hasTaxAgent":true,"today":"2026-11-01"}
+→ verdict "agent_needed", incomeTax.returnDeadline "2028-03-15", residentTax.jan1Tip (leaving by 2026-12-31 would avoid FY2027)
+
+Parameters: departureDate (required, YYYY-MM-DD), plan (leave | short), arrivalDate (first registered in Japan), employment (employee | self_employed | none), payMethod (salary | self | none), jobEndDate, incomeLastYear, needsTaxReturn, prevYearReturnPending, incomeAfterLeaving, hasTaxAgent, nationality (foreign | japanese), pensionMonths, securities100M, today. Japanese aliases accepted (会社員, 個人事業主, 特別徴収, 普通徴収, 一時出国…).
+
+Verdicts: agent_needed | settle_before_departure | nothing_after_departure | still_resident (trip under a year).
+
+Bad input → 400 {error, docs, example, disclaimer}: missing / invalid departureDate, invalid enum, arrival after departure, non-boolean flags.
+
+### Other endpoints
+- GET https://japan-leaving-tax.vercel.app/api/rules
+- https://japan-leaving-tax.vercel.app/openapi.json
+- https://japan-leaving-tax.vercel.app/.well-known/ai-plugin.json
+- MCP: tool japan_leaving_tax_check on https://free-agent-tools.vercel.app/mcp
+
+## Sources (official)
+- https://www.soumu.go.jp/main_sosiki/jichi_zeisei/czaisei/czaisei_seido/individual-inhabitant-tax.html (MIC: 個人住民税, departure cases)
+- https://www.soumu.go.jp/main_content/001029062.pdf (MIC: 出国者の個人住民税)
+- https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1920.htm (NTA 1920: 海外勤務と所得税額の精算)
+- https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1926.htm (NTA 1926: 海外勤務中に不動産所得などがある場合)
+- https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1923.htm (NTA 1923: 納税管理人の選任又は解任)
+- https://www.nta.go.jp/taxes/shiraberu/taxanswer/shotoku/1478.htm (NTA 1478: 国外転出時課税)
+- https://www.nta.go.jp/about/organization/tokyo/topics/kokugai/index.htm (Tokyo Regional Taxation Bureau: 国外転出される方へ)
+- https://www.nenkin.go.jp/international/english/japanese-system/benefit/payment.html (Japan Pension Service: Lump-sum Withdrawal Payments)
+- https://laws.e-gov.go.jp/law/325AC0000000226 (地方税法)
+- https://laws.e-gov.go.jp/law/340AC0000000033 (所得税法)
+- https://laws.e-gov.go.jp/law/337AC0000000066 (国税通則法)
+- https://laws.e-gov.go.jp/law/342AC0000000081 (住民基本台帳法)
+- City examples: https://www.city.higashiosaka.lg.jp/0000043347.html · https://www.city.urayasu.lg.jp/todokede/zeikin/1033128/1033484.html · https://www.city.ichinomiya.aichi.jp/faq/1005662/1005979/1051266.html
+
+## Other free tools by the same maker
+- Japan Pet Quarantine Check (dogs and cats into / out of Japan, 180-day wait, 2027 export rule): https://japan-pet-quarantine.vercel.app
+- Japan Re-entry Deadline Check (last day to be back in Japan: deemed re-entry, re-entry permit, renewal-pending special period): https://japan-reentry-check.vercel.app
+- Japan Customs Allowance Checker (duty-free allowance on arrival, duty estimate, cash declaration): https://japan-customs-allowance.vercel.app
+- Japan Luggage Check (Shinkansen oversized-baggage rule + luggage forwarding cost): https://japan-luggage.vercel.app
+- Japan My Number Card Expiry Check (foreign residents' card ends with the period of stay): https://japan-mynumber-card-check.vercel.app
+- Japan Visa Fee Calculator (residence permit fees from 2026-10-01): https://japan-visa-fee.vercel.app
+- Japan PR Guideline Check (permanent residence guideline revised 2026-10-01): https://japan-pr-check.vercel.app
+- Japan HSP Points Calculator (Highly Skilled Professional visa points, 70 / 80): https://japan-hsp-points.vercel.app
+- Japan Overseas Dependents Check (国外居住親族 dependent deduction): https://japan-overseas-dependents.vercel.app
+- Japan Part-time Work Check (資格外活動許可, 28-hour rule): https://japan-parttime-check.vercel.app
+- Japan Driving Check (foreign licence, IDP, 外免切替): https://japan-driving-check.vercel.app
+- Japan International Postage 2027 (Japan Post prices now vs from 2027-02-01): https://japan-intl-postage.vercel.app
+- Japan Tax-Free Refund Checker (refund-method tax-free shopping from 2026-11-01): https://japan-tax-free-refund.vercel.app
+- Japan TB Screening Check (JPETS TB clearance for COE / visa): https://japan-tb-screening.vercel.app
+- Japan Alert Decoder (Japanese emergency alerts explained): https://japan-alert-decoder.vercel.app
+- Japan Dual Pricing Check (resident vs non-resident prices): https://japan-dual-pricing.vercel.app
+- Kyushu Travel Discount Calculator (九州ふっこう応援割): https://kyushu-travel-discount.vercel.app
+- House Rules Check (Airbnb house rules from 2026-11-20): https://house-rules-check.vercel.app
+- Japan Trip Brain (Japan trip planner): https://japan-trip-brain.vercel.app
+- Free Agent Tools MCP (all these tools as one MCP server): https://free-agent-tools.vercel.app
