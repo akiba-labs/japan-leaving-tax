@@ -350,6 +350,7 @@ export function checkLeaving(input: LeavingInput): LeavingResult {
   if (foreign) actions.push("Leaving for good: hand in your residence card at the airport. Keeping status with a (deemed) re-entry permit? Check Japan Re-entry Check first.");
   actions.push("My Number card: you can keep using it abroad if you apply for it when filing the 転出届 (since 2024-05-27); otherwise it stops working.");
 
+  if (passed(D)) warnings.push(`This departure date (${D}) has already passed (today in Japan: ${today}), so the "before you leave" steps below are late. Contact your city / ward office tax section (住民税, 納税管理人, 転出届) and the tax office (準確定申告) now and ask what to do.`);
   if (exitTax) warnings.push("Exit tax (国外転出時課税): with ¥100M+ in securities and 5 of the last 10 years resident, unrealised gains are taxed on departure. Talk to a 税理士.");
   if (fyList.some((f) => f.status === "owed")) warnings.push("Unpaid 住民税 can be collected later and can be a problem if you return to Japan and renew or change your status.");
   if (input.needsTaxReturn === undefined && employment === "employee") warnings.push("Assumed salary-only income (no tax return). Side income over ¥200k, salary over ¥20M or two employers usually means a return: set needsTaxReturn=true.");

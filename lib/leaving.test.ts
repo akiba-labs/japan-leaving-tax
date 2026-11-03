@@ -78,3 +78,21 @@ test("helpers and errors", () => {
   assert.throws(() => checkLeaving({ departureDate: "2027-02-30" }), RuleInputError);
   assert.throws(() => checkLeaving({ departureDate: "2027-02-01", arrivalDate: "2027-03-01" }), RuleInputError);
 });
+
+test("departure date already passed → top-level warning, verdict and summary unchanged", () => {
+  const past = checkLeaving({ departureDate: "2026-10-20", today: T });
+  assert.match(past.warnings[0], /^This departure date \(2026-10-20\) has already passed \(today in Japan: 2026-11-01\)/);
+  assert.match(past.warnings[0], /city \/ ward office/);
+  assert.match(past.warnings[0], /tax office/);
+  const sameDayView = checkLeaving({ departureDate: "2026-10-20", today: "2026-10-20" });
+  assert.equal(past.verdict, sameDayView.verdict);
+  assert.equal(past.summary, sameDayView.summary);
+  assert.deepEqual(past.warnings.slice(1), sameDayView.warnings);
+  assert.ok(past.disclaimer.length > 0);
+});
+
+test("departure today or later → no passed-date warning", () => {
+  for (const d of ["2026-11-01", "2026-11-02", "2027-03-20"]) {
+    assert.ok(!checkLeaving({ departureDate: d, today: T }).warnings.some((w) => w.includes("has already passed")), d);
+  }
+});
