@@ -9,6 +9,7 @@ export const HONESTY =
   "Rules as of 2026-11-01 from the Local Tax Act (地方税法), Income Tax Act (所得税法), Act on General Rules for National Taxes, Basic Resident Registration Act, MIC resident-tax pages, NTA Tax Answers and the Japan Pension Service. It gives dates and obligations from what you enter, not yen amounts, and doesn't check tax treaties or your city's own procedure.";
 
 export const SIBLING_TOOLS = [
+  { href: "https://japan-disaster-prep.vercel.app", label: "Japan Disaster Prep Check" },
   { href: "https://japan-pet-quarantine.vercel.app", label: "Japan Pet Quarantine Check" },
   { href: "https://japan-customs-allowance.vercel.app", label: "Japan Customs Allowance" },
   { href: "https://japan-luggage.vercel.app", label: "Japan Luggage Check" },
