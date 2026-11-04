@@ -10,6 +10,7 @@ export const HONESTY =
 
 export const SIBLING_TOOLS = [
   { href: "https://japan-disaster-prep.vercel.app", label: "Japan Disaster Prep Check" },
+  { href: "https://japan-lost-item.vercel.app", label: "Japan Lost Item Check" },
   { href: "https://japan-pet-quarantine.vercel.app", label: "Japan Pet Quarantine Check" },
   { href: "https://japan-customs-allowance.vercel.app", label: "Japan Customs Allowance" },
   { href: "https://japan-luggage.vercel.app", label: "Japan Luggage Check" },
