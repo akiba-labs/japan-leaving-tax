@@ -61,6 +61,7 @@ Bad input → 400 {error, docs, example, disclaimer}: missing / invalid departur
 - Japan Job Loss Check (ISA 14-day notice, 雇用保険, 任意継続/国保, pension after leaving a job): https://japan-job-loss.vercel.app
 - Japan Visa Renewal Window Check (在留期間更新 window, 特例期間, 2026-10 fees, PR card renewal): https://japan-visa-renewal.vercel.app
 - Japan JLPT Level Check (JLPT N1–N5 vs HSP points, 46号, Business Manager B2, SSW, PR B1): https://japan-jlpt-check.vercel.app
+- Japan Graduate Visa Check (留学 → work visa timing: 1 Dec–31 Jan for April starts, 継続就職活動 / 内定者 特定活動, part-time end, 14-day notice): https://japan-graduate-visa.vercel.app
 - Japan Pet Quarantine Check (dogs and cats into / out of Japan, 180-day wait, 2027 export rule): https://japan-pet-quarantine.vercel.app
 - Japan Re-entry Deadline Check (last day to be back in Japan: deemed re-entry, re-entry permit, renewal-pending special period): https://japan-reentry-check.vercel.app
 - Japan Customs Allowance Checker (duty-free allowance on arrival, duty estimate, cash declaration): https://japan-customs-allowance.vercel.app
