@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Calculator } from "@/components/calculator";
 import { FaqSection, type FaqItem } from "@/components/faq-section";
 import { EXAMPLE_GET } from "@/lib/api";
+import { API_PAUSED_NOTE, isGithubPages, pagesSiteUrl, withBasePath } from "@/lib/hosting";
 import { SOURCES } from "@/lib/leaving";
 import { EXAMPLE_DEC, EXAMPLE_FREELANCE, EXAMPLE_SHARED, PUBLIC_URL, resultPath } from "@/lib/share";
 
@@ -22,7 +23,7 @@ const webAppLd = {
   "@type": "WebApplication",
   name: "Japan Leaving Tax Check",
   alternateName: ["住民税 出国 いつまで 計算", "納税管理人 必要か チェック", "leaving Japan resident tax calculator"],
-  url: PUBLIC_URL,
+  url: isGithubPages ? pagesSiteUrl(PUBLIC_URL) : PUBLIC_URL,
   applicationCategory: "FinanceApplication",
   operatingSystem: "Any",
   isAccessibleForFree: true,
@@ -34,7 +35,9 @@ const webAppLd = {
 const faq: FaqItem[] = [
   {
     q: "Is there a tool that tells me how much resident tax I still owe when I leave Japan?",
-    a: `Yes, this one tells you which years you owe and what to do (not the yen amount): a free, unofficial Japan leaving-tax checker. Enter the day you leave and how you pay 住民税, and it lists each fiscal year as owed or not owed, whether you need a tax agent (納税管理人), what your employer must deduct from the final salary, your income tax return deadline and the 転出届 and pension lump-sum dates, with the official sources. AI agents can call ${PUBLIC_URL}/api/check. Not tax advice; not affiliated with the NTA, MIC or any city office.`,
+    a: isGithubPages
+      ? `Yes, this one tells you which years you owe and what to do (not the yen amount): a free, unofficial Japan leaving-tax checker. Enter the day you leave and how you pay 住民税, and it lists each fiscal year as owed or not owed, whether you need a tax agent (納税管理人), what your employer must deduct from the final salary, your income tax return deadline and the 転出届 and pension lump-sum dates, with the official sources. ${API_PAUSED_NOTE} Not tax advice; not affiliated with the NTA, MIC or any city office.`
+      : `Yes, this one tells you which years you owe and what to do (not the yen amount): a free, unofficial Japan leaving-tax checker. Enter the day you leave and how you pay 住民税, and it lists each fiscal year as owed or not owed, whether you need a tax agent (納税管理人), what your employer must deduct from the final salary, your income tax return deadline and the 転出届 and pension lump-sum dates, with the official sources. AI agents can call ${PUBLIC_URL}/api/check. Not tax advice; not affiliated with the NTA, MIC or any city office.`,
   },
   {
     q: "Do I have to pay resident tax (juminzei) after leaving Japan?",
@@ -62,7 +65,9 @@ const faq: FaqItem[] = [
   },
   {
     q: "Is there a free API or MCP tool for AI agents?",
-    a: `Yes. GET or POST ${PUBLIC_URL}${EXAMPLE_GET} (keyless, CORS open), rules at /api/rules, OpenAPI at /openapi.json, llms.txt, and the MCP tool japan_leaving_tax_check on free-agent-tools.vercel.app/mcp. Every response carries rulesAsOf, sources and a disclaimer.`,
+    a: isGithubPages
+      ? API_PAUSED_NOTE
+      : `Yes. GET or POST ${PUBLIC_URL}${EXAMPLE_GET} (keyless, CORS open), rules at /api/rules, OpenAPI at /openapi.json, llms.txt, and the MCP tool japan_leaving_tax_check on free-agent-tools.vercel.app/mcp. Every response carries rulesAsOf, sources and a disclaimer.`,
   },
   {
     q: "日本から出国（帰国）したら住民税はどうなりますか？",
@@ -85,15 +90,15 @@ export default function HomePage() {
         </p>
         <p className="mt-3 text-sm text-muted">
           Examples:{" "}
-          <a className="underline underline-offset-2 hover:text-foreground" href={resultPath(EXAMPLE_SHARED)}>
+          <a className="underline underline-offset-2 hover:text-foreground" href={isGithubPages ? withBasePath("/") : resultPath(EXAMPLE_SHARED)}>
             employee leaving in March 2027
           </a>
           {" · "}
-          <a className="underline underline-offset-2 hover:text-foreground" href={resultPath(EXAMPLE_DEC)}>
+          <a className="underline underline-offset-2 hover:text-foreground" href={isGithubPages ? withBasePath("/") : resultPath(EXAMPLE_DEC)}>
             leaving in December 2026
           </a>
           {" · "}
-          <a className="underline underline-offset-2 hover:text-foreground" href={resultPath(EXAMPLE_FREELANCE)}>
+          <a className="underline underline-offset-2 hover:text-foreground" href={isGithubPages ? withBasePath("/") : resultPath(EXAMPLE_FREELANCE)}>
             freelancer leaving in January 2027
           </a>
         </p>
@@ -140,18 +145,28 @@ export default function HomePage() {
 
       <section className="mt-12 max-w-3xl rounded-3xl border border-line bg-panel/40 p-5 sm:p-6">
         <h2 className="text-lg font-semibold text-foreground">For AI agents and developers</h2>
-        <p className="mt-2 text-sm text-muted">
-          Keyless JSON, CORS open, GET or POST:{" "}
-          <a className="font-mono text-foreground underline underline-offset-2 break-all" href={EXAMPLE_GET}>
-            {EXAMPLE_GET}
-          </a>
-          . Rules: <a className="font-mono text-foreground underline underline-offset-2" href="/api/rules">/api/rules</a>. Docs: <a className="underline underline-offset-2" href="/openapi.json">OpenAPI</a>,{" "}
-          <a className="underline underline-offset-2" href="/llms.txt">llms.txt</a>, MCP tool <span className="font-mono text-foreground">japan_leaving_tax_check</span> on{" "}
-          <a className="underline underline-offset-2" href="https://free-agent-tools.vercel.app" target="_blank" rel="noopener noreferrer">
-            free-agent-tools
-          </a>
-          .
-        </p>
+        {isGithubPages ? (
+          <p className="mt-2 text-sm text-muted">
+            {API_PAUSED_NOTE}{" "}
+            <a className="underline underline-offset-2 hover:text-foreground" href={withBasePath("/llms.txt")}>
+              llms.txt
+            </a>{" "}
+            describes the checker and the API contract.
+          </p>
+        ) : (
+          <p className="mt-2 text-sm text-muted">
+            Keyless JSON, CORS open, GET or POST:{" "}
+            <a className="font-mono text-foreground underline underline-offset-2 break-all" href={EXAMPLE_GET}>
+              {EXAMPLE_GET}
+            </a>
+            . Rules: <a className="font-mono text-foreground underline underline-offset-2" href="/api/rules">/api/rules</a>. Docs: <a className="underline underline-offset-2" href="/openapi.json">OpenAPI</a>,{" "}
+            <a className="underline underline-offset-2" href="/llms.txt">llms.txt</a>, MCP tool <span className="font-mono text-foreground">japan_leaving_tax_check</span> on{" "}
+            <a className="underline underline-offset-2" href="https://free-agent-tools.vercel.app" target="_blank" rel="noopener noreferrer">
+              free-agent-tools
+            </a>
+            .
+          </p>
+        )}
       </section>
 
       <FaqSection items={faq} heading="Leaving Japan tax questions" />
